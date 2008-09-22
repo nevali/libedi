@@ -1,0 +1,13 @@
+
+[2008-02-17: VERSION 1.0.1]
+
+[NEW] Added preset edi_edifact_params.
+
+[NEW] Added missing edi_interchange_build() to generate an interchange message from an edi_interchange_t object.
+
+[FIXED] Resolve issue where segment->tag would not correctly be set when a data element is added to a segment. 
+
+[2008-02-17: VERSION 1]
+
+[NEW] Initial release.
+

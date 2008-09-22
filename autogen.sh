@@ -1,0 +1,18 @@
+#! /bin/sh
+
+# @(#) $Id$
+
+AUTOHEADER26=${AUTOHEADER26-autoheader26}
+LIBTOOLIZE15=${LIBTOOLIZE15-libtoolize15}
+ACLOCAL110=${ACLOCAL110-aclocal110}
+AUTOMAKE110=${AUTOMAKE110-automake110}
+AUTOCONF26=${AUTOCONF26-autoconf26}
+
+set -x
+
+${AUTOHEADER26}
+${LIBTOOLIZE15} --force --copy --automake
+${ACLOCAL110}
+${AUTOMAKE110} --add-missing --copy
+${AUTOCONF26}
+
