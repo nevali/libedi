@@ -25,6 +25,11 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-EXTRA_DIST = README ChangeLog
+lib_LTLIBRARIES = libedi.la
 
-SUBDIRS = include libedi tests
+libedi_la_CPPFLAGS = -DLIBEDI_INTERNAL=1 -I${top_srcdir}/include -I${top_builddir}/include
+
+libedi_la_SOURCES = p_libedi.h \
+	parse.c build.c edifact.c
+
+libedi_la_LDFLAGS = -avoid-version

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "libedi.h"
 
@@ -24,7 +25,7 @@ dump_element(size_t index, edi_element_t *el)
 {
 	size_t c;
 	
-	fprintf(stderr, "  %3d %c ", index, el->type);
+	fprintf(stderr, "  %3u %c ", (unsigned int) index, el->type);
 	if(el->type == EDI_ELEMENT_SIMPLE)
 	{
 		fprintf(stderr, " '%s'\n", el->simple.value);
@@ -49,7 +50,7 @@ dump_segment(size_t index, edi_segment_t *s)
 {
 	size_t c;
 	
-	fprintf(stderr, "Segment %u [%s]:\n", index, s->tag);
+	fprintf(stderr, "Segment %u [%s]:\n", (unsigned int) index, s->tag);
 	for(c = 0; c < s->nelements; c++)
 	{
 		dump_element(c, &(s->elements[c]));
@@ -83,16 +84,17 @@ main(int argc, char **argv)
 	
 	edi_interchange_build(i, NULL, buf, sizeof(buf));
 	
-	printf("Source:\n%s\n", msg1);
-	printf("Generated:\n%s\n", buf);
+	fprintf(stderr, "Source:\n%s\n", msg1);
+	fprintf(stderr, "Generated:\n%s\n", buf);
 	c = strcmp(msg1, buf);
 	if(c)
 	{
 		fprintf(stderr, "Source and generated versions differ\n");
+		puts("FAIL");
 	}
 	else
 	{
-		fprintf(stderr, "Source and generated versions match\n");
+		puts("PASS");
 	}
 	edi_interchange_destroy(i);
 		

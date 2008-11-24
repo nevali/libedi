@@ -25,6 +25,10 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-EXTRA_DIST = README ChangeLog
+CPPFLAGS += -I${top_srcdir}/include -I${top_builddir}/include
 
-SUBDIRS = include libedi tests
+
+noinst_PROGRAMS = test-1
+
+test_1_SOURCES = test-1.c
+test_1_LDADD = ../libedi/libedi.la
