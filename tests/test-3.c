@@ -1,5 +1,5 @@
-/* test-1: parse an EDIFACT message with no interchange header compare the
- * source to generated output based upon the parsed message.
+/* test-3: X12 source parsing, should produce broken output by default because
+ * the interchange header won't match the actual output.
  */
 
 #include <stdio.h>
@@ -7,22 +7,45 @@
 
 #include "libedi.h"
 
-const char *msg1 = 
-	"UNB+IATB:1+6XPPC+LHPPC+940101:0950+1'"
-	"UNH+1+PAORES:93:1:IA'"
-	"MSG+1:45'"
-	"IFT+3+XYZCOMPANY AVAILABILITY'"
-	"ERC+A7V:1:AMD'"
-	"IFT+3+NO MORE FLIGHTS'"
-	"ODI'"
-	"TVL+240493:1000::1220+FRA+JFK+DL+400+C'"
-	"PDI++C:3+Y::3+F::1'"
-	"APD+74C:0:::6++++++6X'"
-	"TVL+240493:1740::2030+JFK+MIA+DL+081+C'"
-	"PDI++C:4'"
-	"APD+EM2:0:1630::6+++++++DA'"
-	"UNT+13+1'"
-	"UNZ+1+1'";
+/* Input */
+const char *msgin = 
+	"ISA:00:          :00:          :01:1515151515     :01:5151515151     :041201:1217:U:00304:000032123:0:P:*~"
+	"GS:CT:9988776655:1122334455:041201:1217:128:X:003040~"
+	"ST:831:00128001~"
+	"BGN:00:88200001:041201~"
+	"N9:BT:88200001~"
+	"TRN:1:88200001~"
+	"AMT:2:100000.00~"
+	"AMT:2:200000.00~"
+	"AMT:2:300000.00~"
+	"AMT:2:400000.00~"
+	"QTY:41:1~"
+	"QTY:41:2~"
+	"QTY:41:3~"
+	"QTY:41:4~"
+	"SE:7:00128001~"
+	"GE:1:128~"
+	"IEA:1:000032123~";
+
+/* Output */
+const char *msgout = 
+	"ISA+00+          +00+          +01+1515151515     +01+5151515151     +041201+1217+U+00304+000032123+0+P+'"
+	"GS+CT+9988776655+1122334455+041201+1217+128+X+003040'"
+	"ST+831+00128001'"
+	"BGN+00+88200001+041201'"
+	"N9+BT+88200001'"
+	"TRN+1+88200001'"
+	"AMT+2+100000.00'"
+	"AMT+2+200000.00'"
+	"AMT+2+300000.00'"
+	"AMT+2+400000.00'"
+	"QTY+41+1'"
+	"QTY+41+2'"
+	"QTY+41+3'"
+	"QTY+41+4'"
+	"SE+7+00128001'"
+	"GE+1+128'"
+	"IEA+1+000032123'";
 
 void
 dump_element(size_t index, edi_element_t *el)
@@ -84,13 +107,14 @@ main(int argc, char **argv)
 	(void) argv;
 	
 	p = edi_parser_create(NULL);
-	i = edi_parser_parse(p, msg1);
+	i = edi_parser_parse(p, msgin);
 	
 	edi_interchange_build(i, NULL, buf, sizeof(buf));
 	
-	fprintf(stderr, "Source:\n%s\n", msg1);
+	fprintf(stderr, "Source:\n%s\n", msgin);
+	fprintf(stderr, "Expected:\n%s\n", msgout);
 	fprintf(stderr, "Generated:\n%s\n", buf);
-	c = strcmp(msg1, buf);
+	c = strcmp(msgout, buf);
 	if(c)
 	{
 		fprintf(stderr, "Source and generated versions differ\n");

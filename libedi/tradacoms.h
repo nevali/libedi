@@ -27,64 +27,36 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef P_LIBEDI_H_
-# define P_LIBEDI_H_                   1
+/* TRADACOMS technically uses an old version of the EDI specification which
+ * eventually became UN/EDIFACT. Although this original specification defines
+ * a lead-in segment analogous to UNA (in this case, SCH), it is not used
+ * in practice.
+ *
+ * TRADACOMS defaults are:
+ *
+ * Sub-element separator is : (colon)
+ * Tag separator is = (equals)
+ * Element separator is + (plus)
+ * Decimal notation is . (period)
+ * Escape character is ? (question mark)
+ * Segment separator is ' (apostrophe)
+ *
+ * If TRADACOMS is being used, the first segment will be STX, and the message
+ * will be terminated by END.
+ */
 
-# include <stdio.h>
-# include <stdlib.h>
-# include <string.h>
-# ifdef HAVE_PTHREAD_H
-#  include <pthread.h>
-# endif
-
-# define LIBEDI_EXPORTS                1
-# ifdef PIC
-#  define LIBEDI_SHARED                1
-# endif
-
-# include "libedi.h"
-
-struct edi_parser_struct
-{
-	int error; /* Error status */
-	int sep_seg; /* Segment separator */
-	int sep_data; /* Data element separator */
-	int sep_sub; /* Sub-element separator */
-	int sep_tag; /* Tag delimiter */
-	int escape; /* Escape (release) character */
-	int detect; /* If 1, allow auto-detection */
-	char *root; /* Root element to use by default */
+static const edi_detector_t edi__tradacoms_detectors[] = {
+	{ "STX", 0, 0, 0, 0, 0, 0, 0 },
+	{ NULL, 0, 0, 0, 0, 0, 0, 0 }
 };
 
-struct edi_interchange_private_struct
-{
-	char **stringpool;
-	char **sp;
-	size_t *poolsize;
-	size_t npools;
+static const edi_params_t edi__tradacoms_params = {
+	EDI_VERSION,
+	'\'',
+	'+',
+	':',
+	'=',
+	'?',
+	"TRADACOMS",
+	"STX/END,MHD/MTR"
 };
-
-struct edi_regparams_struct
-{
-	char name[32];
-	edi_params_t params;
-	size_t ndetectors;
-	size_t nalloc;
-	edi_detector_t *detectors;
-};
-
-# define STRINGPOOL_BLOCKSIZE          512
-# define SEG_BLOCKSIZE                 8
-# define ELEMENT_BLOCKSIZE             8
-
-int edi__init(void);
-
-ssize_t edi__stringpool_get(edi_interchange_t *msg, size_t minsize);
-char *edi__stringpool_alloc(edi_interchange_t *msg, size_t length);
-int edi__stringpool_free(edi_interchange_t *msg, char *p);
-int edi__stringpool_destroy(edi_interchange_t *msg);
-
-int edi__detect_init(void);
-int edi__detect(edi_parser_t *parser, const char *message, edi_params_t *params, size_t *skip);
-
-#endif /* !P_LIBEDI_H_ */

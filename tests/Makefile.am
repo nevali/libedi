@@ -27,8 +27,18 @@
 
 CPPFLAGS += -I${top_srcdir}/include -I${top_builddir}/include
 
+EXTRA_DIST = run-tests.sh
 
-noinst_PROGRAMS = test-1
+noinst_PROGRAMS = test-1 test-2 test-3
 
 test_1_SOURCES = test-1.c
 test_1_LDADD = ../libedi/libedi.la
+
+test_2_SOURCES = test-2.c
+test_2_LDADD = ../libedi/libedi.la
+
+test_3_SOURCES = test-3.c
+test_3_LDADD = ../libedi/libedi.la
+
+tests: run-tests.sh ${noinst_PROGRAMS}
+	./run-tests.sh

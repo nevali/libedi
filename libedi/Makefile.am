@@ -29,7 +29,7 @@ lib_LTLIBRARIES = libedi.la
 
 libedi_la_CPPFLAGS = -DLIBEDI_INTERNAL=1 -I${top_srcdir}/include -I${top_builddir}/include
 
-libedi_la_SOURCES = p_libedi.h \
-	parse.c build.c edifact.c
+libedi_la_SOURCES = p_libedi.h edifact.h tradacoms.h x12.h \
+	init.c stringpool.c parse.c detect.c build.c
 
 libedi_la_LDFLAGS = -avoid-version

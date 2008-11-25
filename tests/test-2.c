@@ -1,5 +1,5 @@
-/* test-1: parse an EDIFACT message with no interchange header compare the
- * source to generated output based upon the parsed message.
+/* test-2: test auto-detection by reading an EDIFACT message with an
+ * interchange header and writing output with the default separators.
  */
 
 #include <stdio.h>
@@ -7,7 +7,27 @@
 
 #include "libedi.h"
 
-const char *msg1 = 
+/* Input */
+const char *msgin = 
+	"UNA:>.? '"
+	"UNB>IATB:1>6XPPC>LHPPC>940101:0950>1'"
+	"UNH>1>PAORES:93:1:IA'"
+	"MSG>1:45'"
+	"IFT>3>XYZCOMPANY AVAILABILITY'"
+	"ERC>A7V:1:AMD'"
+	"IFT>3>NO MORE FLIGHTS'"
+	"ODI'"
+	"TVL>240493:1000::1220>FRA>JFK>DL>400>C'"
+	"PDI>>C:3>Y::3>F::1'"
+	"APD>74C:0:::6>>>>>>6X'"
+	"TVL>240493:1740::2030>JFK>MIA>DL>081>C'"
+	"PDI>>C:4'"
+	"APD>EM2:0:1630::6>>>>>>>DA'"
+	"UNT>13>1'"
+	"UNZ>1>1'";
+
+/* Output */
+const char *msgout = 
 	"UNB+IATB:1+6XPPC+LHPPC+940101:0950+1'"
 	"UNH+1+PAORES:93:1:IA'"
 	"MSG+1:45'"
@@ -84,13 +104,14 @@ main(int argc, char **argv)
 	(void) argv;
 	
 	p = edi_parser_create(NULL);
-	i = edi_parser_parse(p, msg1);
+	i = edi_parser_parse(p, msgin);
 	
 	edi_interchange_build(i, NULL, buf, sizeof(buf));
 	
-	fprintf(stderr, "Source:\n%s\n", msg1);
+	fprintf(stderr, "Source:\n%s\n", msgin);
+	fprintf(stderr, "Expected:\n%s\n", msgout);
 	fprintf(stderr, "Generated:\n%s\n", buf);
-	c = strcmp(msg1, buf);
+	c = strcmp(msgout, buf);
 	if(c)
 	{
 		fprintf(stderr, "Source and generated versions differ\n");

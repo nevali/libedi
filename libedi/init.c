@@ -1,7 +1,7 @@
 /* @(#) $Id$ */
 
 /*
- * Copyright (c) 2008 Mo McRoberts.
+ * Copyright (c) 2003, 2004, 2005, 2006, 2007, 2008 Mo McRoberts.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,11 +33,28 @@
 
 #include "p_libedi.h"
 
-const edi_params_t edi_edifact_params = {
-	EDI_VERSION,
-	'\'',
-	'+',
-	':',
-	'+',
-	'?'
-};
+static int edi__init_complete;
+
+#ifdef LIBEDI_USE_PTHREAD
+static pthread_mutex_t edi__init_lock = PTHREAD_MUTEX_INITIALIZER;
+#endif
+
+int
+edi__init(void)
+{
+	int r;
+	
+	r = 0;
+#ifdef LIBEDI_USE_PTHREAD
+	pthread_mutex_lock(&edi__init_lock);
+#endif
+	if(0 == edi__init_complete)
+	{
+		r = edi__detect_init();
+	}
+	edi__init_complete = 1;
+#ifdef LIBEDI_USE_PTHREAD
+	pthread_mutex_unlock(&edi__init_lock);
+#endif
+	return r;
+}

@@ -1,0 +1,15 @@
+Makefile
+Makefile.in
+.libs
+.deps
+*.o
+*.lo
+*.loT
+*.a
+*.la
+*.dll
+*.exe
+tests.log
+test-1
+test-2
+test-3

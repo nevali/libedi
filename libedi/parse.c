@@ -33,67 +33,36 @@
 
 #include "p_libedi.h"
 
-/* Copy from src to dest, removing an escape character, returning the number of
- * bytes copied into dest.
- */
-static size_t
-memcpyescape(char *dest, const char *src, int escape, size_t len)
-{
-	size_t c;
-	int e;
-	
-	e = 0;
-	c = 0;
-	while(len)
-	{
-		if(e)
-		{
-			*dest = *src;
-			dest++;
-			src++;
-			len--;
-			c++;
-			e = 0;
-		}
-		else if(escape && *src == escape)
-		{
-			e = 1;
-			src++;
-			len--;
-		}
-		else
-		{
-			*dest = *src;
-			dest++;
-			src++;
-			c++;
-			len--;
-		}
-	}
-	return c;
-}
+static int edi__parser_init(edi_parser_t *parser, const edi_params_t *params);
+static size_t memcpyescape(char *dest, const char *src, int escape, size_t len);
 
 edi_parser_t *
 edi_parser_create(const edi_params_t *params)
 {
 	edi_parser_t *p;
 	
+	if(-1 == edi__init())
+	{
+		return NULL;
+	}
 	if(NULL == (p = (edi_parser_t *) calloc(1, sizeof(edi_parser_t))))
 	{
 		return NULL;
 	}
-	p->error = EDI_ERR_NONE;
 	if(NULL == params)
 	{
-		params = &edi_edifact_params;
+		/* Provide some sensible defaults, just in case */
+		p->sep_seg = '\'';
+		p->sep_data = '+';
+		p->sep_sub = ':';
+		p->sep_tag = '+';
+		p->escape = '?';
+		p->detect = 1;
 	}
-	if(params->version >= 0x0100)
+	else if(-1 == edi__parser_init(p, params))
 	{
-		p->sep_seg = params->segment_separator;
-		p->sep_data = params->element_separator;
-		p->sep_sub = params->subelement_separator;
-		p->sep_tag = params->tag_separator;
-		p->escape = params->escape;
+		free(p);
+		return NULL;
 	}
 	return p;
 }
@@ -106,7 +75,7 @@ edi_parser_destroy(edi_parser_t *parser)
 }
 
 edi_interchange_t *
-edi_parser_parse(edi_parser_t *parser, const char *message)
+edi_parser_parse(edi_parser_t *oparser, const char *message)
 {
 	int e;
 	const char *ts;
@@ -115,9 +84,34 @@ edi_parser_parse(edi_parser_t *parser, const char *message)
 	edi_interchange_t *p;
 	edi_segment_t *seg, *segp;
 	edi_element_t *el, *elp;
-	size_t segalloc, elalloc;
+	size_t skip, segalloc, elalloc;
 	int newel;
+	edi_parser_t *parser, staticparser;
+	edi_params_t params;
 	
+	parser = oparser;
+	if(1 == oparser->detect)
+	{
+		/* Attempt auto-detection; if it succeeds, and a params
+		 * struct is returned, construct a temporary parser based upon
+		 * it and skip the necessary number of bytes.
+		 */
+		params.version = 0;
+		if(-1 == edi__detect(oparser, message, &params, &skip))
+		{
+			return NULL;
+		}
+		if(0 != params.version)
+		{
+			if(-1 == edi__parser_init(&staticparser, &params))
+			{
+				oparser->error = EDI_ERR_SYSTEM;
+				return NULL;
+			}
+			parser = &staticparser;
+		}
+		message += skip;
+	}
 	parser->error = EDI_ERR_NONE;
 	if(NULL == (p = edi_interchange_create()))
 	{
@@ -155,6 +149,7 @@ edi_parser_parse(edi_parser_t *parser, const char *message)
 		seg->interchange = p;
 		elalloc = 0;
 		newel = 1;
+		el = NULL;
 		/* Loop the data elements */
 		while(*message && *message != parser->sep_seg)
 		{
@@ -275,4 +270,65 @@ int
 edi_parser_error(edi_parser_t *p)
 {
 	return p->error;
+}
+
+static int
+edi__parser_init(edi_parser_t *p, const edi_params_t *params)
+{
+	memset(p, 0, sizeof(edi_parser_t));
+	p->detect = 1;
+	p->error = EDI_ERR_NONE;
+	if(NULL == params)
+	{
+		params = &edi_edifact_params;
+	}
+	if(params->version >= 0x0100)
+	{
+		p->sep_seg = params->segment_separator;
+		p->sep_data = params->element_separator;
+		p->sep_sub = params->subelement_separator;
+		p->sep_tag = params->tag_separator;
+		p->escape = params->escape;
+	}
+	return 0;
+}
+
+/* Copy from src to dest, removing an escape character, returning the number of
+ * bytes copied into dest.
+ */
+static size_t
+memcpyescape(char *dest, const char *src, int escape, size_t len)
+{
+	size_t c;
+	int e;
+	
+	e = 0;
+	c = 0;
+	while(len)
+	{
+		if(e)
+		{
+			*dest = *src;
+			dest++;
+			src++;
+			len--;
+			c++;
+			e = 0;
+		}
+		else if(escape && *src == escape)
+		{
+			e = 1;
+			src++;
+			len--;
+		}
+		else
+		{
+			*dest = *src;
+			dest++;
+			src++;
+			c++;
+			len--;
+		}
+	}
+	return c;
 }

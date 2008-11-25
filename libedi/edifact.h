@@ -27,64 +27,36 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef P_LIBEDI_H_
-# define P_LIBEDI_H_                   1
 
-# include <stdio.h>
-# include <stdlib.h>
-# include <string.h>
-# ifdef HAVE_PTHREAD_H
-#  include <pthread.h>
-# endif
+/* UNA<subelement separator><tag separator|element separator><decimal notation><escape character><reserved (space)><segment separator>
+ *
+ * Default values are:
+ *  
+UNA:+.? '
+ * Sub-element separator is : (colon)
+ * Tag separator and element separator is + (plus)
+ * Decimal notation is . (period)
+ * Escape character is ? (question mark)
+ * Segment separator is ' (apostrophe)
+ *
+ * If UNA is absent, the first segment will be UNB, terminated with UNZ.
+ */
 
-# define LIBEDI_EXPORTS                1
-# ifdef PIC
-#  define LIBEDI_SHARED                1
-# endif
 
-# include "libedi.h"
-
-struct edi_parser_struct
-{
-	int error; /* Error status */
-	int sep_seg; /* Segment separator */
-	int sep_data; /* Data element separator */
-	int sep_sub; /* Sub-element separator */
-	int sep_tag; /* Tag delimiter */
-	int escape; /* Escape (release) character */
-	int detect; /* If 1, allow auto-detection */
-	char *root; /* Root element to use by default */
+static const edi_detector_t edi__edifact_detectors[] = {
+	{ "UNA", 0, 9, 8, 4, 3, 4, 6 },
+	{ "UNB", 0, 0, 0, 0, 0, 0, 0 },
+	{ NULL, 0, 0, 0, 0, 0, 0, 0 }
 };
 
-struct edi_interchange_private_struct
-{
-	char **stringpool;
-	char **sp;
-	size_t *poolsize;
-	size_t npools;
+/* This is public because it was in 1.0.1 */
+const edi_params_t edi_edifact_params = {
+	EDI_VERSION,
+	'\'',
+	'+',
+	':',
+	'+',
+	'?',
+	"EDIFACT",
+	"UNB/UNZ,UNG/UNE,UNH/UNT"
 };
-
-struct edi_regparams_struct
-{
-	char name[32];
-	edi_params_t params;
-	size_t ndetectors;
-	size_t nalloc;
-	edi_detector_t *detectors;
-};
-
-# define STRINGPOOL_BLOCKSIZE          512
-# define SEG_BLOCKSIZE                 8
-# define ELEMENT_BLOCKSIZE             8
-
-int edi__init(void);
-
-ssize_t edi__stringpool_get(edi_interchange_t *msg, size_t minsize);
-char *edi__stringpool_alloc(edi_interchange_t *msg, size_t length);
-int edi__stringpool_free(edi_interchange_t *msg, char *p);
-int edi__stringpool_destroy(edi_interchange_t *msg);
-
-int edi__detect_init(void);
-int edi__detect(edi_parser_t *parser, const char *message, edi_params_t *params, size_t *skip);
-
-#endif /* !P_LIBEDI_H_ */

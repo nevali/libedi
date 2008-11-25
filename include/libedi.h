@@ -32,7 +32,7 @@
 
 # include <sys/types.h>
 
-# define EDI_VERSION                   0x0100
+# define EDI_VERSION                   0x0102
 
 # define EDI_ELEMENT_SIMPLE            'S'
 # define EDI_ELEMENT_COMPOSITE         'C'
@@ -43,11 +43,29 @@
 # define EDI_ERR_EMPTY                 3      /* Parsing ended because the message was empty */
 
 typedef struct edi_parser_struct edi_parser_t;
+typedef struct edi_detector_struct edi_detector_t;
 typedef struct edi_params_struct edi_params_t;
+typedef struct edi_regparams_struct edi_regparams_t;
 typedef struct edi_interchange_struct edi_interchange_t;
 typedef struct edi_segment_struct edi_segment_t;
 typedef union edi_element_struct edi_element_t;
 typedef struct edi_interchange_private_struct edi_interchange_private_t;
+
+/* Detector specifiers */
+struct edi_detector_struct
+{
+	const char *detectstr;
+	size_t position;
+	size_t skipbytes;
+	/* Separator positions, relative to <position>. Set to zero to indicate
+	 * that defaults should be used.
+	 */
+	size_t segment_separator_pos;
+	size_t element_separator_pos;
+	size_t subelement_separator_pos;
+	size_t tag_separator_pos;
+	size_t escape_pos;
+};
 
 /* Parser parameters structure. Always set version to EDI_VERSION to indicate
  * which version of the structure you've compiled against.
@@ -60,6 +78,12 @@ struct edi_params_struct
 	unsigned char subelement_separator;
 	unsigned char tag_separator;
 	unsigned char escape;
+	/* The tag used for the root node, which replaces the start/end segments
+	 * in XML output.
+	 */
+	const char *xml_root_node;
+	/* List of container segments, in the form START/END,START/END,... */
+	const char *containers;
 };
 
 /* An EDI interchange (message), consisting of a number of segments */

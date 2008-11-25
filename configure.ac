@@ -25,7 +25,7 @@ dnl LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 dnl NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
 dnl SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-AC_INIT(libedi, 1.0.1)
+AC_INIT(libedi, 1.0.2)
 AC_CONFIG_SRCDIR([libedi/parse.c])
 AM_INIT_AUTOMAKE([foreign])
 AM_MAINTAINER_MODE
@@ -35,6 +35,29 @@ export CPPFLAGS
 
 AC_PROG_CC
 AC_PROG_LIBTOOL
+
+AC_ARG_ENABLE(pthread, [AS_HELP_STRING([--enable-pthread],[Use POSIX threads (default=auto)])],[use_pthread=$enableval],[use_pthread=auto])
+
+AC_MSG_CHECKING([whether to use POSIX threads])
+AC_MSG_RESULT([${use_pthread}])
+if test x"${use_pthread}" = x"auto" || test x"${use_pthread}" = x"yes" ; then
+	pthread_present=yes
+	AC_CHECK_HEADER([pthread.h],[AC_DEFINE_UNQUOTED([HAVE_PTHREAD_H],1,[Define to 1 if you have the <pthread.h> header file.])],pthread_present=no)
+	if test x"${pthread_present}" = x"yes" ; then
+		AC_CHECK_LIB(pthread,pthread_create)
+		AC_CHECK_FUNC(pthread_create,,pthread_present=no)
+	fi
+	if test x"${pthread_present}" = x"no" && test x"${use_pthread}" = x"yes"; then
+		AC_MSG_ERROR([POSIX threads support was requested but it cannot be located])
+	fi
+	use_pthread=${pthread_present}
+fi
+
+if test x"${use_pthread}" = x"yes" ; then
+	AC_DEFINE_UNQUOTED([LIBEDI_USE_PTHREAD], 1, [Define to use POSIX threads for locking])
+else
+	use_pthread=no
+fi
 
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_FILES([Makefile
