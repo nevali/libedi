@@ -77,6 +77,8 @@ struct edi_regparams_struct
 # define SEG_BLOCKSIZE                 8
 # define ELEMENT_BLOCKSIZE             8
 
+extern const edi_params_t edi__default_params;
+
 int edi__init(void);
 
 ssize_t edi__stringpool_get(edi_interchange_t *msg, size_t minsize);

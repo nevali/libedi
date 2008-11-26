@@ -216,7 +216,7 @@ edi_interchange_destroy(edi_interchange_t *msg)
 }
 
 static size_t
-addescaped(unsigned char *buf, size_t bufpos, size_t buflen, char *value, size_t vlen, const edi_params_t *params)
+addescaped(unsigned char *buf, size_t bufpos, size_t buflen, const char *value, size_t vlen, const edi_params_t *params)
 {
 	size_t n;
 	char *p;
@@ -248,24 +248,121 @@ addescaped(unsigned char *buf, size_t bufpos, size_t buflen, char *value, size_t
 	return bufpos - n;
 }
 
+static size_t
+addhdrtrailer(unsigned char *buf, size_t bufpos, size_t buflen, const char *format, edi_interchange_t *msg, const edi_params_t *params)
+{
+	size_t n;
+	
+	(void) msg;
+	
+	n = bufpos;
+	for(; *format && bufpos < buflen; format++)
+	{
+		if('%' == *format)
+		{
+			format++;
+			switch(*format)
+			{
+				case '_':
+					if(bufpos > 0)
+					{
+						buf--;
+						bufpos--;
+					}
+					continue;
+				case 'S':
+					*buf = params->segment_separator;
+					break;
+				case 'E':
+					*buf = params->element_separator;
+					break;
+				case 's':
+					*buf = params->subelement_separator;
+					break;
+				case 'T':
+					*buf = params->tag_separator;
+					break;
+				case 'R':
+					*buf = params->escape;
+					break;
+				default:
+					*buf = '%';
+					buf++;
+					bufpos++;
+					if(bufpos >= buflen)
+					{
+						*buf = 0;
+						return bufpos - n;
+					}
+					*buf = *format;
+			}
+			buf++;
+			bufpos++;
+		}
+		else
+		{
+			*buf = *format;
+			buf++;
+			bufpos++;
+		}
+	}
+	*buf = 0;
+	return bufpos - n;
+}
+
 size_t
 edi_interchange_build(edi_interchange_t *msg, const edi_params_t *params, char *buf, size_t buflen)
 {
 	size_t c, d, i, n, bufpos;
 	unsigned char *bp;
+	const char *hdrname, *hdrtrail;
+	int dohdrtrailer;
 	
 	if(NULL == params)
 	{
-		params = &edi_edifact_params;
+		params = &edi__default_params;
 	}
 	bp = (unsigned char *) buf;
 	bufpos = 0;
+	hdrname = NULL;
+	hdrtrail = NULL;
+	dohdrtrailer = 0;
+	if(0x0103 <= params->version)
+	{
+		if(NULL != params->ss_name && NULL != params->ss_trailer)
+		{
+			hdrname = params->ss_name;
+			hdrtrail = params->ss_trailer;
+		}
+	}
 	for(c = 0; c < msg->nsegments; c++)
 	{
 		for(d = 0; d < msg->segments[c].nelements; d++)
 		{
 			if(msg->segments[c].elements[d].type == EDI_ELEMENT_SIMPLE)
 			{
+				if(NULL != hdrname)
+				{
+					if(0 == c && 0 == d)
+					{
+						if(strlen(hdrname) == msg->segments[c].elements[d].simple.valuelen &&
+							0 == strncmp(hdrname, msg->segments[c].elements[d].simple.value, msg->segments[c].elements[d].simple.valuelen))
+						{
+							dohdrtrailer = 1;
+						}
+						else
+						{
+							n = addescaped(bp, bufpos, buflen, hdrname, strlen(hdrname), params);
+							bp += n;
+							bufpos += n;
+							if(bufpos >= buflen) break;
+							n = addhdrtrailer(bp, bufpos, buflen, hdrtrail, msg, params);
+							bp += n;
+							bufpos += n;
+							if(bufpos >= buflen) break;
+						}
+					}
+				}
 				n = addescaped(bp, bufpos, buflen, msg->segments[c].elements[d].simple.value, msg->segments[c].elements[d].simple.valuelen, params);
 				bp += n;
 				bufpos += n;
@@ -274,6 +371,28 @@ edi_interchange_build(edi_interchange_t *msg, const edi_params_t *params, char *
 			{
 				for(i = 0; i < msg->segments[c].elements[d].composite.nvalues; i++)
 				{
+					if(NULL != hdrname)
+					{
+						if(0 == c && 0 == d && 0 == i)
+						{
+							if(strlen(hdrname) == msg->segments[c].elements[d].simple.valuelen &&
+								0 == strncmp(hdrname, msg->segments[c].elements[d].simple.value, msg->segments[c].elements[d].simple.valuelen))
+							{
+								dohdrtrailer = 1;
+							}
+							else
+							{
+								n = addescaped(bp, bufpos, buflen, hdrname, strlen(hdrname), params);
+								bp += n;
+								bufpos += n;
+								if(bufpos >= buflen) break;
+								n = addhdrtrailer(bp, bufpos, buflen, hdrtrail, msg, params);
+								bp += n;
+								bufpos += n;
+								if(bufpos >= buflen) break;
+							}
+						}
+					}
 					n = addescaped(bp, bufpos, buflen, msg->segments[c].elements[d].composite.values[i], msg->segments[c].elements[d].composite.valuelens[i], params);
 					bp += n;
 					bufpos += n;
@@ -304,10 +423,20 @@ edi_interchange_build(edi_interchange_t *msg, const edi_params_t *params, char *
 			if(bufpos >= buflen) break;
 		}
 		if(bufpos >= buflen) break;
-		*bp = params->segment_separator;
-		bp++;
-		bufpos++;
+		if(1 == dohdrtrailer)
+		{
+			n = addhdrtrailer(bp, bufpos, buflen, hdrtrail, msg, params);
+			bp += n;
+			bufpos += n;
+		}
+		else
+		{
+			*bp = params->segment_separator;
+			bp++;
+			bufpos++;
+		}
 		if(bufpos >= buflen) break;
+		dohdrtrailer = 0;
 	}
 	*bp = 0;
 	return bufpos;

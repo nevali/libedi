@@ -280,7 +280,7 @@ edi__parser_init(edi_parser_t *p, const edi_params_t *params)
 	p->error = EDI_ERR_NONE;
 	if(NULL == params)
 	{
-		params = &edi_edifact_params;
+		params = &edi__default_params;
 	}
 	if(params->version >= 0x0100)
 	{

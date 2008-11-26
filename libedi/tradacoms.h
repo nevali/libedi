@@ -58,5 +58,7 @@ static const edi_params_t edi__tradacoms_params = {
 	'=',
 	'?',
 	"TRADACOMS",
-	"STX/END,MHD/MTR"
+	"STX/END,MHD/MTR",
+	NULL,
+	NULL
 };

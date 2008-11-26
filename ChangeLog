@@ -4,6 +4,8 @@
 
 [NEW] Re-organised sources to aid maintainability.
 
+[NEW] Service string advice can now be automatically generated, either as a standalone header (as in UN/EDIFACT) or as part of the interchange header (as in ANSI X12).
+
 [FIXED] A number of thread-safety issues have been resolved.
 
 [2008-02-17: VERSION 1.0.1]

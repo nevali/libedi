@@ -58,7 +58,7 @@ edi__detect_init(void)
 {
 	edi__detect_regset("UN/EDIFACT", &edi_edifact_params, edi__edifact_detectors);
 	edi__detect_regset("TRADACOMS", &edi__tradacoms_params, edi__tradacoms_detectors);
-	edi__detect_regset("X12", &edi__x12_params, edi__x12_detectors);
+	edi__detect_regset("ANSI X12", &edi__x12_params, edi__x12_detectors);
 	return 0;
 }
 
@@ -322,7 +322,7 @@ edi__detect_params_copy(edi_params_t *dest, const edi_params_t *src)
 	dest->subelement_separator = ':';
 	dest->tag_separator = '+';
 	dest->escape = '?';
-	if(src->version >= 0x1000)
+	if(src->version >= 0x0100)
 	{
 		dest->segment_separator = src->segment_separator;
 		dest->element_separator = src->element_separator;
@@ -346,6 +346,24 @@ edi__detect_params_copy(edi_params_t *dest, const edi_params_t *src)
 				return -1;
 			}
 		}
+	}
+	if(src->version >= 0x0103)
+	{
+		if(NULL != src->ss_name)
+		{
+			if(NULL == (dest->ss_name = strdup(src->ss_name)))
+			{
+				return -1;
+			}
+		}
+		if(NULL != src->ss_trailer)
+		{
+			if(NULL == (dest->ss_trailer = strdup(src->ss_trailer)))
+			{
+				return -1;
+			}
+		}
+		
 	}
 	return 0;
 }

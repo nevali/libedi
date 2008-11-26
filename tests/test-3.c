@@ -7,8 +7,8 @@
 
 #include "libedi.h"
 
-/* Input */
-const char *msgin = 
+/* Input, Output */
+const char *msg = 
 	"ISA:00:          :00:          :01:1515151515     :01:5151515151     :041201:1217:U:00304:000032123:0:P:*~"
 	"GS:CT:9988776655:1122334455:041201:1217:128:X:003040~"
 	"ST:831:00128001~"
@@ -26,26 +26,6 @@ const char *msgin =
 	"SE:7:00128001~"
 	"GE:1:128~"
 	"IEA:1:000032123~";
-
-/* Output */
-const char *msgout = 
-	"ISA+00+          +00+          +01+1515151515     +01+5151515151     +041201+1217+U+00304+000032123+0+P+'"
-	"GS+CT+9988776655+1122334455+041201+1217+128+X+003040'"
-	"ST+831+00128001'"
-	"BGN+00+88200001+041201'"
-	"N9+BT+88200001'"
-	"TRN+1+88200001'"
-	"AMT+2+100000.00'"
-	"AMT+2+200000.00'"
-	"AMT+2+300000.00'"
-	"AMT+2+400000.00'"
-	"QTY+41+1'"
-	"QTY+41+2'"
-	"QTY+41+3'"
-	"QTY+41+4'"
-	"SE+7+00128001'"
-	"GE+1+128'"
-	"IEA+1+000032123'";
 
 void
 dump_element(size_t index, edi_element_t *el)
@@ -107,14 +87,14 @@ main(int argc, char **argv)
 	(void) argv;
 	
 	p = edi_parser_create(NULL);
-	i = edi_parser_parse(p, msgin);
+	i = edi_parser_parse(p, msg);
 	
-	edi_interchange_build(i, NULL, buf, sizeof(buf));
+	edi_interchange_build(i, edi_detect_get_params("ANSI X12"), buf, sizeof(buf));
 	
-	fprintf(stderr, "Source:\n%s\n", msgin);
-	fprintf(stderr, "Expected:\n%s\n", msgout);
+	fprintf(stderr, "Source:\n%s\n", msg);
+	fprintf(stderr, "Expected:\n%s\n", msg);
 	fprintf(stderr, "Generated:\n%s\n", buf);
-	c = strcmp(msgout, buf);
+	c = strcmp(msg, buf);
 	if(c)
 	{
 		fprintf(stderr, "Source and generated versions differ\n");

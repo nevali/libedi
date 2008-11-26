@@ -28,6 +28,7 @@ const char *msgin =
 
 /* Output */
 const char *msgout = 
+	"UNA:+.? '"
 	"UNB+IATB:1+6XPPC+LHPPC+940101:0950+1'"
 	"UNH+1+PAORES:93:1:IA'"
 	"MSG+1:45'"
@@ -106,7 +107,7 @@ main(int argc, char **argv)
 	p = edi_parser_create(NULL);
 	i = edi_parser_parse(p, msgin);
 	
-	edi_interchange_build(i, NULL, buf, sizeof(buf));
+	edi_interchange_build(i, edi_detect_get_params("UN/EDIFACT"), buf, sizeof(buf));
 	
 	fprintf(stderr, "Source:\n%s\n", msgin);
 	fprintf(stderr, "Expected:\n%s\n", msgout);

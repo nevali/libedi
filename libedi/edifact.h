@@ -58,5 +58,23 @@ const edi_params_t edi_edifact_params = {
 	'+',
 	'?',
 	"EDIFACT",
-	"UNB/UNZ,UNG/UNE,UNH/UNT"
+	"UNB/UNZ,UNG/UNE,UNH/UNT",
+	"UNA",
+	"%s%E.%R %S"
+};
+
+/* Default parameters are based upon EDIFACT */
+
+/* This is public because it was in 1.0.1 */
+const edi_params_t edi__default_params = {
+	EDI_VERSION,
+	'\'',
+	'+',
+	':',
+	'+',
+	'?',
+	"EDIFACT",
+	"UNB/UNZ,UNG/UNE,UNH/UNT",
+	NULL, /* Don't output an interchange header by default */
+	NULL
 };

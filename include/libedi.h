@@ -32,7 +32,7 @@
 
 # include <sys/types.h>
 
-# define EDI_VERSION                   0x0102
+# define EDI_VERSION                   0x0103
 
 # define EDI_ELEMENT_SIMPLE            'S'
 # define EDI_ELEMENT_COMPOSITE         'C'
@@ -84,6 +84,17 @@ struct edi_params_struct
 	const char *xml_root_node;
 	/* List of container segments, in the form START/END,START/END,... */
 	const char *containers;
+	/* Interchange header name (e.g., UNA, ISA) */
+	const char *ss_name;
+	/* Interchange header trailer; replaces the segment separator. Format:
+	  %_ = backspace (used by X12)
+	  %S = segment separator
+	  %E = element separator
+	  %s = subelement separator
+	  %T = tag separator
+	  %R = release (escape)
+	*/
+	const char *ss_trailer;
 };
 
 /* An EDI interchange (message), consisting of a number of segments */
@@ -178,6 +189,11 @@ PUBLISHED edi_segment_t *edi_segment_create(edi_interchange_t *interchange, cons
 
 PUBLISHED edi_element_t *edi_element_create(edi_segment_t *seg, const char *value);
 PUBLISHED int edi_element_add(edi_element_t *el, const char *value);
+
+/* Detection */
+PUBLISHED edi_regparams_t *edi_params_register(const char *name, const edi_params_t *params);
+PUBLISHED const edi_regparams_t *edi_detect_get(const char *name);
+PUBLISHED const edi_params_t *edi_detect_get_params(const char *name);
 
 /* Presets */
 

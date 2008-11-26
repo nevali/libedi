@@ -45,11 +45,13 @@ static const edi_detector_t edi__x12_detectors[] = {
  */
 static const edi_params_t edi__x12_params = {
 	EDI_VERSION,
-	'\'',
-	'+',
+	'~',
 	':',
-	'=',
+	'*',
+	':',
 	0,
 	"X12",
-	"ISA/IEA,GS/GE,ST/SE"
+	"ISA/IEA,GS/GE,ST/SE",
+	"ISA",
+	"%_%E%s%S"
 };
