@@ -114,6 +114,7 @@ struct edi_segment_struct
 	edi_element_t *elements;
 	size_t nelements;
 	char *tag;
+	size_t offset;
 };
 
 /* An EDI data element. This comes in one of two flavours - EDI_ELEMENT_SIMPLE,

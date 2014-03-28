@@ -88,6 +88,7 @@ edi_parser_parse(edi_parser_t *oparser, const char *message)
 	int newel;
 	edi_parser_t *parser, staticparser;
 	edi_params_t params;
+	const char * msg_start = message;
 	
 	parser = oparser;
 	if(1 == oparser->detect)
@@ -141,12 +142,13 @@ edi_parser_parse(edi_parser_t *oparser, const char *message)
 				break;
 			}
 			p->segments = segp;
-			segalloc += 8;
+			segalloc += SEG_BLOCKSIZE;
 		}
 		seg = &(p->segments[p->nsegments]);
 		p->nsegments++;
 		memset(seg, 0, sizeof(edi_segment_t));
 		seg->interchange = p;
+		seg->offset = message - msg_start;
 		elalloc = 0;
 		newel = 1;
 		el = NULL;
