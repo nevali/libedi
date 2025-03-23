@@ -25,8 +25,6 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-CPPFLAGS += -I${top_srcdir}/include -I${top_builddir}/include
-
 check_PROGRAMS = test-1 test-2 test-3
 
 TESTS = $(check_PROGRAMS)

@@ -1,6 +1,6 @@
 # @(#) $Id$
 
-# Copyright (c) 2003, 2004, 2005, 2006, 2007, 2008 Mo McRoberts.
+# Copyright (c) 2003, 2004, 2005, 2006, 2007, 2008, 2025 Mo McRoberts.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -27,7 +27,7 @@
 
 lib_LTLIBRARIES = libedi.la
 
-libedi_la_CPPFLAGS = -DLIBEDI_INTERNAL=1 -I${top_srcdir}/include -I${top_builddir}/include
+libedi_la_CPPFLAGS = -DLIBEDI_INTERNAL=1 ${AM_CPPFLAGS}
 
 libedi_la_SOURCES = p_libedi.h edifact.h tradacoms.h x12.h \
 	init.c stringpool.c parse.c detect.c build.c

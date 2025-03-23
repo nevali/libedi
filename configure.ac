@@ -26,15 +26,30 @@ dnl NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 dnl SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 AC_INIT(libedi, 1.1.0)
+
+: ${CFLAGS=""}
+: ${CPPFLAGS=""}
+: ${LDFLAGS=""}
+
 AC_CONFIG_SRCDIR([libedi/parse.c])
 AM_INIT_AUTOMAKE([foreign])
 AM_MAINTAINER_MODE
 
-CPPFLAGS="$CPPFLAGS -W -Wall -D_REENTRANT"
-export CPPFLAGS
+AC_PROG_CC([clang gcc c11 c99 cc])
+LT_INIT
 
-AC_PROG_CC
-AC_PROG_LIBTOOL
+AS_VAR_APPEND([AM_CPPFLAGS],[' -I${top_builddir}/include -I${top_srcdir}/include'])
+
+if test "$GCC" = "yes" ; then
+	AS_VAR_APPEND([AM_CPPFLAGS],[' -W -Wall'])
+fi
+
+AC_ARG_ENABLE(debug, [AS_HELP_STRING([--disable-debug],[Disable compiler and linker flags helpful for debugging])],[debug=$enableval],[debug=yes])
+
+if test "$GCC" = "yes" && test "$debug" = "yes" ; then
+	AS_VAR_APPEND([AM_CPPFLAGS],[' -Werror'])
+	AS_VAR_APPEND([AM_CFLAGS],[' -g -O0'])
+fi
 
 AC_ARG_ENABLE(pthread, [AS_HELP_STRING([--enable-pthread],[Use POSIX threads (default=auto)])],[use_pthread=$enableval],[use_pthread=auto])
 
@@ -58,6 +73,10 @@ if test x"${use_pthread}" = x"yes" ; then
 else
 	use_pthread=no
 fi
+
+AC_SUBST([AM_CPPFLAGS])
+AC_SUBST([AM_CFLAGS])
+AC_SUBST([AM_LDFLAGS])
 
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_FILES([Makefile

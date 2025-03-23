@@ -22,6 +22,10 @@ $ make install
 You will need to have `autoconf`, `automake` and `libtool` installed — they
 should be available via your system package manager.
 
+By default (if `clang` or `gcc` is detected), `libedi` will be built with
+`-Werror -O0 -g`; this can be disabled by passing `--disable-debug` to
+`configure`.
+
 ## References:
 
 ### EDI
