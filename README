@@ -1,5 +1,3 @@
-@(#) $Id: README 7 2008-02-17 21:57:22Z mo $
-
 This is an Electronic Data Interchange (EDI) parser, written in C.
 
 There are several different flavours of EDI, each with their own spin on which
@@ -11,6 +9,18 @@ Note that EDI is not a descriptive message-passing format: unlike many XML-based
 formats, it contains very little information about what the message is and how
 it's supposed to be structured; you're expected to know that already if you're
 sending or receiving the messages.
+
+To build from a git clone, run:
+
+```
+$ autoreconf -fvi
+$ ./configure --prefix=/opt/libedi
+$ make check
+$ make install
+```
+
+You will need to have `autoconf`, `automake` and `libtool` installed — they
+should be available via your system package manager.
 
 References:
 
