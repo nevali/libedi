@@ -4,6 +4,8 @@
 *.lo
 *.la
 *.log
+*.trs
+*~
 Makefile
 Makefile.in
 /libtool
@@ -17,3 +19,4 @@ Makefile.in
 /depcomp
 /install-sh
 /autom4te.cache
+/test-driver

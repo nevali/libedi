@@ -1,6 +1,6 @@
 # @(#) $Id$
 
-# Copyright (c) 2003, 2004, 2005, 2006, 2007, 2008 Mo McRoberts.
+# Copyright (c) 2003, 2004, 2005, 2006, 2007, 2008, 2025 Mo McRoberts.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -27,9 +27,9 @@
 
 CPPFLAGS += -I${top_srcdir}/include -I${top_builddir}/include
 
-EXTRA_DIST = run-tests.sh
+check_PROGRAMS = test-1 test-2 test-3
 
-noinst_PROGRAMS = test-1 test-2 test-3
+TESTS = $(check_PROGRAMS)
 
 test_1_SOURCES = test-1.c
 test_1_LDADD = ../libedi/libedi.la
@@ -39,6 +39,3 @@ test_2_LDADD = ../libedi/libedi.la
 
 test_3_SOURCES = test-3.c
 test_3_LDADD = ../libedi/libedi.la
-
-tests: run-tests.sh ${noinst_PROGRAMS}
-	./run-tests.sh
