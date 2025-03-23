@@ -51,6 +51,8 @@ if test "$GCC" = "yes" && test "$debug" = "yes" ; then
 	AS_VAR_APPEND([AM_CFLAGS],[' -g -O0'])
 fi
 
+AS_VAR_APPEND([AM_CPPFLAGS],[' -D_POSIX_C_SOURCE=200809L'])
+
 AC_ARG_ENABLE(pthread, [AS_HELP_STRING([--enable-pthread],[Use POSIX threads (default=auto)])],[use_pthread=$enableval],[use_pthread=auto])
 
 AC_MSG_CHECKING([whether to use POSIX threads])
