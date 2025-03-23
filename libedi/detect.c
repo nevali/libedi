@@ -1,7 +1,7 @@
 /* @(#) $Id$ */
 
 /*
- * Copyright (c) 2003, 2004, 2005, 2006, 2007, 2008 Mo McRoberts.
+ * Copyright (c) 2003, 2004, 2005, 2006, 2007, 2008, 2025 Mo McRoberts.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -138,7 +138,7 @@ edi__detect(edi_parser_t *parser, const char *message, edi_params_t *params, siz
 			{
 				/* We have a match */
 				*skip = d->skipbytes;
-				memset(params, 0, sizeof(params));
+				memset(params, 0, sizeof(edi_params_t));
 				params->version = EDI_VERSION;
 				params->segment_separator = p->segment_separator;
 				params->element_separator = p->element_separator;

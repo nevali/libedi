@@ -1,7 +1,7 @@
 /* @(#) $Id$ */
 
 /*
- * Copyright (c) 2003, 2004, 2005, 2006, 2007, 2008 Mo McRoberts.
+ * Copyright (c) 2003, 2004, 2005, 2006, 2007, 2008, 2025 Mo McRoberts.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -93,7 +93,7 @@ edi_element_create(edi_segment_t *seg, const char *value)
 	}
 	seg->elements = elp;
 	elp = &(seg->elements[seg->nelements]);
-	memset(elp, 0, sizeof(elp));
+	memset(elp, 0, sizeof(edi_element_t));
 	elp->simple.segment = seg;
 	if(value)
 	{
