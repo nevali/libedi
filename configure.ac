@@ -1,6 +1,6 @@
 dnl @(#) $Id$
 
-dnl Copyright (c) 2003, 2004, 2005, 2006, 2007, 2008 Mo McRoberts.
+dnl Copyright (c) 2003, 2004, 2005, 2006, 2007, 2008, 2025 Mo McRoberts.
 dnl
 dnl Redistribution and use in source and binary forms, with or without
 dnl modification, are permitted provided that the following conditions
@@ -25,7 +25,7 @@ dnl LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 dnl NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
 dnl SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-AC_INIT(libedi, 1.0.2)
+AC_INIT(libedi, 1.1.0)
 AC_CONFIG_SRCDIR([libedi/parse.c])
 AM_INIT_AUTOMAKE([foreign])
 AM_MAINTAINER_MODE
