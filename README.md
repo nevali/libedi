@@ -22,12 +22,14 @@ $ make install
 You will need to have `autoconf`, `automake` and `libtool` installed — they
 should be available via your system package manager.
 
-References:
+## References:
 
- EDI
-	http://en.wikipedia.org/wiki/Electronic_Data_Interchange
-	http://www.theedizone.com/edi_resources/edi_standards.html
+### EDI
+
+* http://en.wikipedia.org/wiki/Electronic_Data_Interchange
+* http://www.theedizone.com/edi_resources/edi_standards.html
 	
- UN/EDIFACT
-	http://en.wikipedia.org/wiki/EDIFACT
-	http://www.unece.org/trade/untdid/texts/d422_d.htm
+### UN/EDIFACT
+
+* http://en.wikipedia.org/wiki/EDIFACT
+* http://www.unece.org/trade/untdid/texts/d422_d.htm
