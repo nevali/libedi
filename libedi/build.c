@@ -114,7 +114,7 @@ int
 edi_element_add(edi_element_t *elp, const char *value)
 {
 	char *v, **vp;
-	size_t vlen, vl, *lp;
+	size_t vlen, *lp;
 	
 	vlen = strlen(value);
 	if(!elp->type)
@@ -135,7 +135,6 @@ edi_element_add(edi_element_t *elp, const char *value)
 	if(elp->type == EDI_ELEMENT_SIMPLE)
 	{
 		v = elp->simple.value;
-		vl = elp->simple.valuelen;
 		vp = (char **) malloc(sizeof(char *) * 2);
 		lp = (size_t *) malloc(sizeof(size_t) * 2);
 		if(!vp || !lp)
@@ -219,11 +218,9 @@ static size_t
 addescaped(unsigned char *buf, size_t bufpos, size_t buflen, const char *value, size_t vlen, const edi_params_t *params)
 {
 	size_t n;
-	char *p;
 
 	(void) vlen;
 	
-	p = (char *) buf;
 	n = bufpos;
 	for(; *value && bufpos < buflen; value++)
 	{
